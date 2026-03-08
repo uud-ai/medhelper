@@ -912,11 +912,11 @@ function renderResult(name, text) {
 
     // Aggregators
     '<div class="pharma-aggregators">' +
-      '<a class="pharma-agg-link" href="https://www.piluli.ru/search?search_text='+enc+'&order=price" target="_blank">' +
+      '<a class="pharma-agg-link" href="https://apteka.ru/search/?q='+enc+'&sort=price_asc" target="_blank">' +
         '<span class="pharma-agg-icon">📊</span>' +
         '<div class="pharma-agg-body">' +
           '<div class="pharma-agg-name">Сравнить цены во всех аптеках</div>' +
-          '<div class="pharma-agg-desc">Piluli.ru — сравнение цен, сортировка по цене</div>' +
+          '<div class="pharma-agg-desc">Apteka.ru — 5000+ аптек, сортировка по цене</div>' +
         '</div>' +
         '<span class="pharma-agg-arrow">→</span>' +
       '</a>' +
@@ -953,14 +953,40 @@ function renderApt() {
     list.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">💊</div>Аптечка пуста<br><span style="font-weight:400">Добавьте препараты из поиска<br>или кнопкой выше</span></div>';
     return;
   }
-  list.innerHTML = state.apteka.map(function(item, i) {
-    var date = new Date(item.addedAt).toLocaleDateString('ru-RU', {day:'numeric',month:'short'});
-    return '<div class="apt-item" onclick="quickSearch(\''+item.name+'\')">' +
-      '<div class="apt-item-icon">💊</div>' +
-      '<div class="apt-item-body">' +
+  // Sort by expiry: expiring soon first, no date last
+  var sorted = state.apteka.map(function(item,i){return {item:item,i:i};}).sort(function(a,b){
+    if (!a.item.expiry && !b.item.expiry) return 0;
+    if (!a.item.expiry) return 1;
+    if (!b.item.expiry) return -1;
+    return a.item.expiry > b.item.expiry ? 1 : -1;
+  });
+
+  list.innerHTML = sorted.map(function(obj) {
+    var item = obj.item; var i = obj.i;
+    var badgeHtml = '';
+    if (item.expiry) {
+      var now = new Date();
+      var exp = new Date(item.expiry + '-01');
+      var expEnd = new Date(exp.getFullYear(), exp.getMonth()+1, 0);
+      var diffDays = Math.floor((expEnd - now) / 86400000);
+      var expStr = exp.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+      if (diffDays < 0) {
+        badgeHtml = '<div class="expiry-badge exp-expired">⛔ Истёк: '+expStr+'</div>';
+      } else if (diffDays <= 60) {
+        badgeHtml = '<div class="expiry-badge exp-soon">⚠️ Скоро истечёт: '+expStr+'</div>';
+      } else {
+        badgeHtml = '<div class="expiry-badge exp-ok">✓ Годен до: '+expStr+'</div>';
+      }
+    } else {
+      badgeHtml = '<div class="expiry-badge exp-none">📅 Срок не указан</div>';
+    }
+    return '<div class="apt-item">' +
+      '<div class="apt-item-icon" onclick="quickSearch(\''+item.name+'\')" style="cursor:pointer">💊</div>' +
+      '<div class="apt-item-body" onclick="quickSearch(\''+item.name+'\')" style="cursor:pointer">' +
         '<div class="apt-item-name">'+item.name+'</div>' +
-        '<div class="apt-item-sub">Добавлено '+date+'</div>' +
+        badgeHtml +
       '</div>' +
+      '<button class="apt-item-del" style="background:var(--accent-l);color:var(--accent);margin-right:6px" onclick="event.stopPropagation();editApt('+i+')" title="Изменить срок">✎</button>' +
       '<button class="apt-item-del" onclick="event.stopPropagation();delFromApt('+i+')" title="Удалить">✕</button>' +
       '</div>';
   }).join('');
@@ -980,6 +1006,27 @@ function addToApt(name) {
 function delFromApt(i) {
   state.apteka.splice(i,1);
   save(); renderApt(); toast('Удалено из аптечки');
+}
+
+function editApt(i) {
+  var item = state.apteka[i];
+  document.getElementById('modalInput').value = item.name;
+  document.getElementById('modalInput').readOnly = true;
+  document.getElementById('modalExpiry').value = item.expiry || '';
+  document.getElementById('addModal').classList.add('open');
+  // Change confirm button to save edit
+  var btn = document.querySelector('#addModal .btn-modal-ok');
+  btn.textContent = 'Сохранить';
+  btn.onclick = function() {
+    state.apteka[i].expiry = document.getElementById('modalExpiry').value;
+    save(); renderApt(); toast('Срок годности обновлён ✓');
+    // Reset modal
+    document.getElementById('modalInput').readOnly = false;
+    btn.textContent = 'Добавить';
+    btn.onclick = confirmAdd;
+    closeModal();
+  };
+  setTimeout(function(){ document.getElementById('modalExpiry').focus(); }, 100);
 }
 
 function openAddModal() {
