@@ -305,6 +305,15 @@ body {
   transition: all .15s; flex-shrink: 0;
 }
 .apt-item-del:hover { background: var(--red); color: white; }
+.expiry-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  margin-top: 4px;
+}
+.exp-ok     { background: var(--green-l); color: var(--green); }
+.exp-soon   { background: var(--amber-l); color: var(--amber); }
+.exp-expired{ background: var(--red-l);   color: var(--red); }
+.exp-none   { background: var(--bg2);     color: var(--text3); }
 
 /* ── COMPAT SCREEN ── */
 .compat-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
@@ -595,7 +604,16 @@ body {
     <div class="modal-title">💊 Добавить препарат</div>
     <input type="text" class="modal-input" id="modalInput"
       placeholder="Название препарата..."
+      onkeydown="if(event.key==='Enter')document.getElementById('modalExpiry').focus()">
+    <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">
+      Срок годности
+    </div>
+    <input type="month" class="modal-input" id="modalExpiry"
+      style="color:var(--text);font-size:15px"
       onkeydown="if(event.key==='Enter')confirmAdd()">
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px">
+      Необязательно — можно оставить пустым
+    </div>
     <div class="modal-btns">
       <button class="btn-modal-cancel" onclick="closeModal()">Отмена</button>
       <button class="btn-modal-ok"     onclick="confirmAdd()">Добавить</button>
@@ -819,8 +837,11 @@ function addToApt(name) {
   if (state.apteka.find(function(a){ return a.name.toLowerCase()===name.toLowerCase(); })) {
     toast('Уже в аптечке!'); return;
   }
-  state.apteka.push({name:name, addedAt:new Date().toISOString()});
-  save(); toast('Добавлено в аптечку ✓');
+  // Open modal pre-filled with name so user can also enter expiry
+  document.getElementById('modalInput').value = name;
+  document.getElementById('modalExpiry').value = '';
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(function(){ document.getElementById('modalExpiry').focus(); }, 100);
 }
 
 function delFromApt(i) {
@@ -839,9 +860,14 @@ function closeModal(e) {
   }
 }
 function confirmAdd() {
-  var name = document.getElementById('modalInput').value.trim();
+  var name   = document.getElementById('modalInput').value.trim();
+  var expiry = document.getElementById('modalExpiry').value; // "YYYY-MM"
   if (!name) return;
-  addToApt(name);
+  if (state.apteka.find(function(a){ return a.name.toLowerCase()===name.toLowerCase(); })) {
+    toast('Уже в аптечке!'); return;
+  }
+  state.apteka.push({name:name, expiry:expiry||'', addedAt:new Date().toISOString()});
+  save(); toast('Добавлено в аптечку ✓');
   closeModal();
   renderApt();
 }
