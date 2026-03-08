@@ -265,6 +265,69 @@ body {
 }
 .source-link:last-child { border-bottom: none; padding-bottom: 0; }
 .source-link:hover { color: var(--accent2); }
+
+/* Pharmacy block */
+.pharma-buy-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); margin-bottom: 12px; overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.pharma-buy-header {
+  background: linear-gradient(135deg, #057a55, #065f46);
+  padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+}
+.pharma-buy-title { color: white; font-size: 14px; font-weight: 800; }
+.pharma-buy-sub   { color: rgba(255,255,255,.75); font-size: 11px; margin-top: 2px; }
+
+.pharma-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.pharma-link {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 14px 10px; text-decoration: none; gap: 6px;
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  transition: background .15s; text-align: center;
+}
+.pharma-link:nth-child(2n) { border-right: none; }
+.pharma-link:nth-last-child(-n+2) { border-bottom: none; }
+.pharma-link:hover { background: var(--green-l); }
+.pharma-logo { font-size: 22px; }
+.pharma-name { font-size: 12px; font-weight: 700; color: var(--text); }
+.pharma-hint { font-size: 10px; color: var(--text3); font-weight: 500; }
+
+.pharma-aggregators {
+  border-top: 1px solid var(--border); padding: 12px 16px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.pharma-agg-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  text-decoration: none; transition: color .15s;
+}
+.pharma-agg-link:last-child { border-bottom: none; padding-bottom: 0; }
+.pharma-agg-link:hover .pharma-agg-name { color: var(--green); }
+.pharma-agg-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
+.pharma-agg-body { flex: 1; }
+.pharma-agg-name { font-size: 13px; font-weight: 700; color: var(--text); transition: color .15s; }
+.pharma-agg-desc { font-size: 11px; color: var(--text3); }
+.pharma-agg-arrow { color: var(--text3); font-size: 14px; }
+
+.btn-ai-price {
+  width: 100%; padding: 13px 16px; border: none; border-radius: 0;
+  border-top: 1px solid var(--border);
+  background: var(--green-l); color: var(--green);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 8px; transition: all .15s;
+}
+.btn-ai-price:hover { background: #bbf7d0; }
+
+.ai-price-result {
+  padding: 14px 16px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text2); line-height: 1.65; font-weight: 500;
+  display: none; animation: slide-up .25s ease;
+}
+.ai-price-result.show { display: block; }
 .source-arrow { margin-left: auto; opacity: .5; }
 
 /* ── APTECHKA SCREEN ── */
@@ -805,6 +868,76 @@ function renderResult(name, text) {
     '<a class="source-link" href="https://www.vidal.ru/search?q='+enc+'" target="_blank">📚 Видаль — Справочник препаратов <span class="source-arrow">→</span></a>' +
     '</div>';
 
+  // Pharmacy buy block
+  html += '<div class="pharma-buy-card">' +
+    '<div class="pharma-buy-header">' +
+      '<div>💰</div>' +
+      '<div><div class="pharma-buy-title">Где купить дешевле</div>' +
+      '<div class="pharma-buy-sub">Поиск в аптеках и агрегаторах</div></div>' +
+    '</div>' +
+
+    // Big pharmacy chains
+    '<div class="pharma-grid">' +
+      '<a class="pharma-link" href="https://apteka.ru/search/?q='+enc+'" target="_blank">' +
+        '<span class="pharma-logo">🏥</span>' +
+        '<span class="pharma-name">Apteka.ru</span>' +
+        '<span class="pharma-hint">Сравнение цен</span>' +
+      '</a>' +
+      '<a class="pharma-link" href="https://www.eapteka.ru/search/?query='+enc+'" target="_blank">' +
+        '<span class="pharma-logo">💊</span>' +
+        '<span class="pharma-name">еАптека</span>' +
+        '<span class="pharma-hint">Доставка за 1 час</span>' +
+      '</a>' +
+      '<a class="pharma-link" href="https://gorzdrav.org/search/?q='+enc+'" target="_blank">' +
+        '<span class="pharma-logo">🔴</span>' +
+        '<span class="pharma-name">Горздрав</span>' +
+        '<span class="pharma-hint">Сеть аптек</span>' +
+      '</a>' +
+      '<a class="pharma-link" href="https://www.rigla.ru/search?query='+enc+'" target="_blank">' +
+        '<span class="pharma-logo">🟢</span>' +
+        '<span class="pharma-name">Ригла</span>' +
+        '<span class="pharma-hint">Сеть аптек</span>' +
+      '</a>' +
+      '<a class="pharma-link" href="https://zdravcity.ru/search/?q='+enc+'" target="_blank">' +
+        '<span class="pharma-logo">🔵</span>' +
+        '<span class="pharma-name">Zdravcity</span>' +
+        '<span class="pharma-hint">Онлайн-аптека</span>' +
+      '</a>' +
+      '<a class="pharma-link" href="https://www.piluli.ru/search?search_text='+enc+'" target="_blank">' +
+        '<span class="pharma-logo">🟡</span>' +
+        '<span class="pharma-name">Piluli.ru</span>' +
+        '<span class="pharma-hint">Агрегатор цен</span>' +
+      '</a>' +
+    '</div>' +
+
+    // Aggregators
+    '<div class="pharma-aggregators">' +
+      '<a class="pharma-agg-link" href="https://apteka.ru/search/?q='+enc+'&sort=price" target="_blank">' +
+        '<span class="pharma-agg-icon">📊</span>' +
+        '<div class="pharma-agg-body">' +
+          '<div class="pharma-agg-name">Сравнить цены во всех аптеках</div>' +
+          '<div class="pharma-agg-desc">Apteka.ru — агрегатор 5000+ аптек России</div>' +
+        '</div>' +
+        '<span class="pharma-agg-arrow">→</span>' +
+      '</a>' +
+      '<a class="pharma-agg-link" href="https://market.yandex.ru/search?text='+enc+'&hid=15756994" target="_blank">' +
+        '<span class="pharma-agg-icon">🔍</span>' +
+        '<div class="pharma-agg-body">' +
+          '<div class="pharma-agg-name">Яндекс Маркет — Аптеки</div>' +
+          '<div class="pharma-agg-desc">Сравнение цен с доставкой</div>' +
+        '</div>' +
+        '<span class="pharma-agg-arrow">→</span>' +
+      '</a>' +
+    '</div>' +
+
+    // AI price hint button
+    '<button class="btn-ai-price" data-drug="'+name+'" onclick="getAiPriceHint(this)">' +
+      '🤖 AI совет — как сэкономить на этом препарате' +
+    '</button>' +
+    '<div class="ai-price-result" id="aiPriceResult"></div>' +
+
+    '</div>';
+
   // Add to apteka button
   html += '<button onclick="addToApt(\''+name+'\')" style="width:100%;padding:13px;border-radius:14px;border:1.5px solid var(--accent);background:var(--accent-ll);color:var(--accent);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">+ Добавить в аптечку</button>';
 
@@ -952,6 +1085,47 @@ function toast(msg) {
   t.textContent = msg; t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
+
+// ── AI PRICE HINT ─────────────────────────────────────────────────────────
+async function getAiPriceHint(btn) {
+  var drugName = btn.getAttribute('data-drug');
+  if (!state.apiKey) { goTo('settingsScreen'); toast('Сначала введи API ключ'); return; }
+  btn.disabled = true;
+  btn.textContent = '⏳ Ищу способы сэкономить...';
+  var resultEl = document.getElementById('aiPriceResult');
+
+  try {
+    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
+      body: JSON.stringify({
+        model: 'anthropic/claude-haiku-4-5',
+        max_tokens: 400,
+        messages: [{
+          role: 'system',
+          content: 'Ты фармацевт-консультант. Давай краткие практичные советы как сэкономить на лекарствах. Отвечай по-русски, кратко, 3-5 пунктов.'
+        },{
+          role: 'user',
+          content: 'Как сэкономить при покупке препарата "' + drugName + '"? Подскажи: есть ли дешёвые аналоги (дженерики), на что обратить внимание при покупке, какая форма выпуска выгоднее. Будь конкретным и кратким.'
+        }]
+      })
+    });
+    var data = await res.json();
+    var text = data.choices && data.choices[0] ? data.choices[0].message.content : '';
+    if (!text) throw new Error('empty');
+
+    resultEl.innerHTML = text
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      .replace(/\n/g, '<br>');
+    resultEl.classList.add('show');
+    btn.style.display = 'none';
+  } catch(e) {
+    btn.textContent = '🤖 AI совет — как сэкономить на этом препарате';
+    btn.disabled = false;
+    toast('Ошибка запроса');
+  }
+}
+
 </script>
 </body>
 </html>
