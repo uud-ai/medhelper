@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>МедСправка</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="МедСправка">
+<meta name="theme-color" content="#f8faff">
+<link rel="manifest" href="med-manifest.json">
+<link rel="icon" type="image/png" href="med-icon-192.png">
+<link rel="apple-touch-icon" href="med-icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #f8faff;
+  --bg2:       #eef2fb;
+  --card:      #ffffff;
+  --accent:    #1a56db;
+  --accent2:   #1e429f;
+  --accent-l:  #ebf0ff;
+  --accent-ll: #f0f5ff;
+  --green:     #057a55;
+  --green-l:   #def7ec;
+  --red:       #c81e1e;
+  --red-l:     #fde8e8;
+  --amber:     #92400e;
+  --amber-l:   #fef3c7;
+  --purple:    #5521b5;
+  --purple-l:  #edebff;
+  --text:      #111928;
+  --text2:     #4b5563;
+  --text3:     #9ca3af;
+  --border:    #e5e7eb;
+  --border2:   #d1d5db;
+  --shadow:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow2:   0 4px 16px rgba(26,86,219,.1);
+  --r:         16px;
+  --font:      'Manrope', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(248,250,255,.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.header-cross {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 16px; font-weight: 800; flex-shrink: 0;
+}
+.header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700; color: var(--text);
+  letter-spacing: -.3px;
+}
+.header-actions { display: flex; gap: 8px; }
+.hdr-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--accent-l); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all .15s;
+}
+.hdr-btn:hover { background: var(--accent); }
+.hdr-btn:hover span { filter: brightness(0) invert(1); }
+
+/* ── NAV ── */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(248,250,255,.97);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex;
+}
+.nav-item {
+  flex: 1; padding: 10px 0 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; border: none; background: none;
+  color: var(--text3); font-family: var(--font);
+  font-size: 10px; font-weight: 700; letter-spacing: .2px;
+  transition: color .2s;
+}
+.nav-item.active { color: var(--accent); }
+.nav-item .ni { font-size: 20px; transition: transform .2s; }
+.nav-item.active .ni { transform: translateY(-1px); }
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 20px 16px 90px; }
+.screen.active { display: block; }
+
+/* ── SEARCH SCREEN ── */
+.search-hero {
+  text-align: center; padding: 24px 0 20px;
+}
+.hero-icon {
+  width: 64px; height: 64px; border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin: 0 auto 16px;
+  box-shadow: var(--shadow2);
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 700; color: var(--text);
+  margin-bottom: 6px;
+}
+.hero-sub { font-size: 14px; color: var(--text2); line-height: 1.5; }
+
+.search-box {
+  position: relative; margin-bottom: 16px;
+}
+.search-icon-wrap {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 18px; pointer-events: none; color: var(--text3);
+}
+.search-input {
+  width: 100%; padding: 14px 52px 14px 46px;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; color: var(--text);
+  font-family: var(--font); font-size: 16px; font-weight: 500;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  box-shadow: var(--shadow);
+}
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,.1); }
+.search-input::placeholder { color: var(--text3); font-weight: 400; }
+.search-clear {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; border-radius: 8px; border: none;
+  background: var(--bg2); color: var(--text3); cursor: pointer;
+  font-size: 14px; display: none; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.search-clear.show { display: flex; }
+.search-clear:hover { background: var(--border2); }
+
+.btn-search {
+  width: 100%; padding: 14px; border-radius: 14px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; font-family: var(--font); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all .2s; margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(26,86,219,.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-search:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(26,86,219,.35); }
+.btn-search:active { transform: translateY(0); }
+.btn-search:disabled { opacity: .6; cursor: default; transform: none; }
+
+/* Quick suggestions */
+.quick-title { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 10px; }
+.quick-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.qchip {
+  padding: 7px 14px; border-radius: 20px;
+  background: var(--card); border: 1.5px solid var(--border);
+  font-size: 13px; font-weight: 600; color: var(--text2);
+  cursor: pointer; transition: all .15s; font-family: var(--font);
+}
+.qchip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-ll); }
+
+/* ── RESULT CARD ── */
+.result-wrap { animation: slide-up .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes slide-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+
+.med-header-card {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 20px; padding: 22px 20px; margin-bottom: 14px;
+  color: white; position: relative; overflow: hidden;
+}
+.med-header-card::before {
+  content: '💊'; position: absolute; right: -8px; top: -8px;
+  font-size: 72px; opacity: .15; transform: rotate(15deg);
+}
+.med-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 700; margin-bottom: 4px; line-height: 1.2;
+}
+.med-name-sub { font-size: 13px; opacity: .8; font-weight: 500; }
+.med-source-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 14px; padding: 5px 12px;
+  background: rgba(255,255,255,.2); border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: .3px;
+}
+
+/* Section cards */
+.section-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); margin-bottom: 12px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.section-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; flex-shrink: 0;
+}
+.si-pharma  { background: var(--purple-l); }
+.si-indica  { background: var(--green-l); }
+.si-contra  { background: var(--red-l); }
+.si-dosage  { background: var(--amber-l); }
+.si-compat  { background: var(--accent-l); }
+
+.section-title-text {
+  font-size: 13px; font-weight: 800; letter-spacing: .3px;
+  text-transform: uppercase;
+}
+.st-pharma  { color: var(--purple); }
+.st-indica  { color: var(--green); }
+.st-contra  { color: var(--red); }
+.st-dosage  { color: var(--amber); }
+.st-compat  { color: var(--accent); }
+
+.section-body {
+  padding: 14px 16px;
+  font-size: 14px; line-height: 1.7; color: var(--text2);
+  font-weight: 500;
+}
+.section-body ul { padding-left: 18px; }
+.section-body li { margin-bottom: 4px; }
+.section-body b { color: var(--text); font-weight: 700; }
+
+/* Disclaimer */
+.disclaimer {
+  background: var(--amber-l); border: 1px solid #fcd34d;
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.disc-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.disc-text { font-size: 12px; color: var(--amber); line-height: 1.55; font-weight: 600; }
+
+/* Sources links */
+.sources-card {
+  background: var(--accent-ll); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 20px;
+}
+.sources-title { font-size: 11px; font-weight: 800; color: var(--text3); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 10px; }
+.source-link {
+  display: flex; align-items: center; gap: 8px; padding: 8px 0;
+  border-bottom: 1px solid var(--border); text-decoration: none;
+  color: var(--accent); font-size: 13px; font-weight: 600;
+  transition: color .15s;
+}
+.source-link:last-child { border-bottom: none; padding-bottom: 0; }
+.source-link:hover { color: var(--accent2); }
+.source-arrow { margin-left: auto; opacity: .5; }
+
+/* ── APTECHKA SCREEN ── */
+.apt-empty {
+  text-align: center; padding: 48px 20px;
+  color: var(--text3); font-size: 14px; font-weight: 600; line-height: 1.6;
+}
+.apt-empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+.apt-add-btn {
+  width: 100%; padding: 14px; border-radius: 14px; border: none;
+  background: var(--accent); color: white;
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-bottom: 20px; transition: all .2s;
+  box-shadow: 0 4px 14px rgba(26,86,219,.25);
+}
+.apt-add-btn:active { transform: scale(.98); }
+
+.apt-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: var(--shadow); cursor: pointer; transition: all .2s;
+}
+.apt-item:hover { border-color: var(--accent); box-shadow: var(--shadow2); }
+.apt-item-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--accent-l); display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.apt-item-body { flex: 1; }
+.apt-item-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+.apt-item-sub  { font-size: 12px; color: var(--text3); font-weight: 500; }
+.apt-item-del {
+  width: 32px; height: 32px; border-radius: 8px; border: none;
+  background: var(--red-l); color: var(--red); cursor: pointer;
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0;
+}
+.apt-item-del:hover { background: var(--red); color: white; }
+
+/* ── COMPAT SCREEN ── */
+.compat-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.compat-label { font-size: 11px; font-weight: 800; color: var(--text3); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 6px; }
+.compat-input {
+  width: 100%; padding: 13px 14px;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 12px; color: var(--text);
+  font-family: var(--font); font-size: 15px; font-weight: 500;
+  outline: none; transition: border-color .2s;
+}
+.compat-input:focus { border-color: var(--accent); }
+.compat-input::placeholder { color: var(--text3); font-weight: 400; }
+
+.compat-plus {
+  text-align: center; font-size: 22px; color: var(--text3); padding: 4px 0;
+}
+
+/* ── LOADING ── */
+.loading-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px 20px; gap: 16px;
+}
+.loading-spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; color: var(--text2); font-weight: 600; text-align: center; }
+.loading-sub   { font-size: 12px; color: var(--text3); text-align: center; }
+
+/* ── SETTINGS ── */
+.settings-section { margin-bottom: 24px; }
+.settings-title { font-size: 11px; font-weight: 800; color: var(--text3); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 12px; }
+.settings-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow);
+}
+.settings-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row-icon { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
+.settings-row-body { flex: 1; }
+.settings-row-label { font-size: 14px; font-weight: 700; margin-bottom: 1px; }
+.settings-row-sub   { font-size: 12px; color: var(--text3); }
+.settings-row-action { flex-shrink: 0; }
+
+.api-key-input {
+  width: 100%; padding: 12px 14px;
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  outline: none; margin-top: 8px; transition: border-color .2s;
+}
+.api-key-input:focus { border-color: var(--accent); }
+
+.btn-save-key {
+  width: 100%; padding: 12px; border-radius: 10px; border: none; margin-top: 8px;
+  background: var(--accent); color: white; font-family: var(--font);
+  font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.btn-save-key:active { transform: scale(.98); }
+
+.key-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 700; margin-top: 6px;
+}
+.key-ok   { color: var(--green); }
+.key-none { color: var(--text3); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 86px; left: 50%; transform: translateX(-50%) translateY(10px);
+  background: var(--text); color: white;
+  border-radius: 10px; padding: 10px 20px;
+  font-size: 13px; font-weight: 700; opacity: 0; transition: all .3s;
+  z-index: 200; white-space: nowrap; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(17,25,40,.5); backdrop-filter: blur(4px);
+  align-items: flex-end; justify-content: center; padding: 0;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border-radius: 24px 24px 0 0;
+  padding: 24px 20px 40px; width: 100%;
+  animation: slide-up .3s ease;
+}
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+.modal-input {
+  width: 100%; padding: 13px 14px;
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: 12px; color: var(--text);
+  font-family: var(--font); font-size: 15px; font-weight: 500;
+  outline: none; margin-bottom: 12px; transition: border-color .2s;
+}
+.modal-input:focus { border-color: var(--accent); }
+.modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-modal-ok {
+  padding: 13px; border-radius: 12px; border: none;
+  background: var(--accent); color: white;
+  font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.btn-modal-cancel {
+  padding: 13px; border-radius: 12px;
+  border: 1.5px solid var(--border); background: transparent;
+  font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer;
+  color: var(--text2);
+}
+
+/* Section title */
+.sec-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; margin-bottom: 16px; color: var(--text);
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <div class="header-cross">✚</div>
+    <div class="header-title">МедСправка</div>
+  </div>
+  <div class="header-actions">
+    <button class="hdr-btn" onclick="goTo('settingsScreen')" title="Настройки"><span>⚙️</span></button>
+  </div>
+</div>
+
+<!-- SCREEN: ПОИСК -->
+<div class="screen active" id="searchScreen">
+  <div class="search-hero">
+    <div class="hero-icon">💊</div>
+    <div class="hero-title">Справочник лекарств</div>
+    <div class="hero-sub">Введите название препарата<br>и получите подробную информацию</div>
+  </div>
+
+  <div class="search-box">
+    <span class="search-icon-wrap">🔍</span>
+    <input type="text" class="search-input" id="searchInput"
+      placeholder="Например: Парацетамол, Аспирин..."
+      oninput="onSearchInput(this.value)"
+      onkeydown="if(event.key==='Enter')searchDrug()">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+
+  <button class="btn-search" id="btnSearch" onclick="searchDrug()">
+    <span>🔍</span> Найти информацию
+  </button>
+
+  <div class="quick-title">Часто ищут</div>
+  <div class="quick-chips">
+    <button class="qchip" onclick="quickSearch('Парацетамол')">Парацетамол</button>
+    <button class="qchip" onclick="quickSearch('Ибупрофен')">Ибупрофен</button>
+    <button class="qchip" onclick="quickSearch('Аспирин')">Аспирин</button>
+    <button class="qchip" onclick="quickSearch('Омепразол')">Омепразол</button>
+    <button class="qchip" onclick="quickSearch('Амоксициллин')">Амоксициллин</button>
+    <button class="qchip" onclick="quickSearch('Метформин')">Метформин</button>
+    <button class="qchip" onclick="quickSearch('Лоратадин')">Лоратадин</button>
+    <button class="qchip" onclick="quickSearch('Но-шпа')">Но-шпа</button>
+  </div>
+
+  <!-- Result area -->
+  <div id="resultArea"></div>
+</div>
+
+<!-- SCREEN: АПТЕЧКА -->
+<div class="screen" id="aptScreen">
+  <div class="sec-title">Моя аптечка</div>
+  <button class="apt-add-btn" onclick="openAddModal()">＋ Добавить препарат</button>
+  <div id="aptList"></div>
+</div>
+
+<!-- SCREEN: СОВМЕСТИМОСТЬ -->
+<div class="screen" id="compatScreen">
+  <div class="sec-title">Совместимость</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6;font-weight:500">
+    Проверьте можно ли принимать два препарата одновременно
+  </div>
+  <div class="compat-form">
+    <div>
+      <div class="compat-label">Препарат 1</div>
+      <input type="text" class="compat-input" id="compat1" placeholder="Например: Аспирин">
+    </div>
+    <div class="compat-plus">＋</div>
+    <div>
+      <div class="compat-label">Препарат 2</div>
+      <input type="text" class="compat-input" id="compat2" placeholder="Например: Ибупрофен">
+    </div>
+  </div>
+  <button class="btn-search" onclick="checkCompat()">
+    <span>⚡</span> Проверить совместимость
+  </button>
+  <div id="compatResult"></div>
+</div>
+
+<!-- SCREEN: НАСТРОЙКИ -->
+<div class="screen" id="settingsScreen">
+  <div class="sec-title">Настройки</div>
+
+  <div class="settings-section">
+    <div class="settings-title">API ключ</div>
+    <div class="settings-card">
+      <div class="settings-row" style="flex-direction:column;align-items:stretch">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span class="settings-row-icon">🔑</span>
+          <div>
+            <div class="settings-row-label">OpenRouter API Key</div>
+            <div class="settings-row-sub">Необходим для AI-запросов</div>
+          </div>
+        </div>
+        <div class="key-status" id="keyStatus">
+          <span class="key-none">● Ключ не установлен</span>
+        </div>
+        <input type="password" class="api-key-input" id="apiKeyInput"
+          placeholder="sk-or-v1-...">
+        <button class="btn-save-key" onclick="saveApiKey()">Сохранить ключ</button>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">
+          Получить бесплатно на <b>openrouter.ai</b> → 50 запросов/день
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-title">О приложении</div>
+    <div class="settings-card">
+      <div class="settings-row">
+        <span class="settings-row-icon">ℹ️</span>
+        <div class="settings-row-body">
+          <div class="settings-row-label">МедСправка</div>
+          <div class="settings-row-sub">Справочник лекарственных препаратов</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-icon">🤖</span>
+        <div class="settings-row-body">
+          <div class="settings-row-label">Источник данных</div>
+          <div class="settings-row-sub">AI на основе официальных инструкций</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-icon">⚠️</span>
+        <div class="settings-row-body">
+          <div class="settings-row-label">Дисклеймер</div>
+          <div class="settings-row-sub">Только справочная информация. Консультируйтесь с врачом</div>
+        </div>
+      </div>
+      <div class="settings-row" style="cursor:pointer" onclick="clearAll()">
+        <span class="settings-row-icon">🗑</span>
+        <div class="settings-row-body">
+          <div class="settings-row-label" style="color:var(--red)">Очистить данные</div>
+          <div class="settings-row-sub">Удалить аптечку и настройки</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-item active" id="nav-search" onclick="goTo('searchScreen')">
+    <span class="ni">🔍</span>Поиск
+  </button>
+  <button class="nav-item" id="nav-apt" onclick="goTo('aptScreen');renderApt()">
+    <span class="ni">💊</span>Аптечка
+  </button>
+  <button class="nav-item" id="nav-compat" onclick="goTo('compatScreen')">
+    <span class="ni">⚡</span>Совмест.
+  </button>
+  <button class="nav-item" id="nav-settings" onclick="goTo('settingsScreen')">
+    <span class="ni">⚙️</span>Настройки
+  </button>
+</nav>
+
+<!-- MODAL: добавить в аптечку -->
+<div class="modal-overlay" id="addModal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">💊 Добавить препарат</div>
+    <input type="text" class="modal-input" id="modalInput"
+      placeholder="Название препарата..."
+      onkeydown="if(event.key==='Enter')confirmAdd()">
+    <div class="modal-btns">
+      <button class="btn-modal-cancel" onclick="closeModal()">Отмена</button>
+      <button class="btn-modal-ok"     onclick="confirmAdd()">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+var state = JSON.parse(localStorage.getItem('medhelper_v1') || 'null') || {
+  apiKey: '',
+  apteka: [], // [{name, addedAt}]
+};
+function save() { localStorage.setItem('medhelper_v1', JSON.stringify(state)); }
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', function() {
+  updateKeyStatus();
+  if (!state.apiKey) {
+    setTimeout(function() {
+      var k = prompt('Введи OpenRouter API ключ (sk-or-...) для поиска лекарств:\n\nПолучить бесплатно: openrouter.ai\nОставь пустым чтобы пропустить:');
+      if (k && k.trim()) { state.apiKey = k.trim(); save(); updateKeyStatus(); toast('API ключ сохранён ✓'); }
+    }, 1200);
+  }
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('med-sw.js').catch(function(){});
+  });
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  var map = {searchScreen:'nav-search',aptScreen:'nav-apt',compatScreen:'nav-compat',settingsScreen:'nav-settings'};
+  if (map[id]) document.getElementById(map[id]).classList.add('active');
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────
+function onSearchInput(v) {
+  var btn = document.getElementById('searchClear');
+  if (v.trim()) btn.classList.add('show'); else btn.classList.remove('show');
+}
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('show');
+  document.getElementById('resultArea').innerHTML = '';
+}
+function quickSearch(name) {
+  document.getElementById('searchInput').value = name;
+  document.getElementById('searchClear').classList.add('show');
+  searchDrug();
+}
+
+async function searchDrug() {
+  var name = document.getElementById('searchInput').value.trim();
+  if (!name) { toast('Введите название препарата'); return; }
+  if (!state.apiKey) { goTo('settingsScreen'); toast('Сначала введи API ключ'); return; }
+
+  var area = document.getElementById('resultArea');
+  area.innerHTML = '<div class="loading-wrap">' +
+    '<div class="loading-spinner"></div>' +
+    '<div class="loading-text">Ищу информацию о препарате...</div>' +
+    '<div class="loading-sub">Анализирую официальные инструкции</div>' +
+    '</div>';
+
+  var btn = document.getElementById('btnSearch');
+  btn.disabled = true;
+
+  try {
+    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
+      body: JSON.stringify({
+        model: 'anthropic/claude-haiku-4-5',
+        max_tokens: 1200,
+        messages: [{
+          role: 'system',
+          content: 'Ты медицинский справочник. Отвечай ТОЛЬКО на основе официальных инструкций к препаратам (как в справочниках РЛС, Видаль, официальных инструкциях Минздрава). Не придумывай информацию. Если препарат неизвестен — честно скажи об этом. Всегда структурируй ответ строго по разделам. Отвечай на русском языке.'
+        },{
+          role: 'user',
+          content: 'Дай справочную информацию о препарате "' + name + '" строго по следующим разделам:\n\n' +
+            '1. ФАРМАКОЛОГИЧЕСКИЕ СВОЙСТВА (механизм действия, группа препарата)\n' +
+            '2. ПОКАЗАНИЯ К ПРИМЕНЕНИЮ (при каких заболеваниях применяется)\n' +
+            '3. ПРОТИВОПОКАЗАНИЯ (кому нельзя принимать)\n' +
+            '4. СПОСОБ ПРИМЕНЕНИЯ И ДОЗЫ (как принимать, какие дозировки)\n\n' +
+            'Каждый раздел начинай с его названия заглавными буквами. Будь точным и кратким. В конце укажи: основан на официальной инструкции к препарату.'
+        }]
+      })
+    });
+
+    var data = await res.json();
+    var text = data.choices && data.choices[0] ? data.choices[0].message.content : '';
+
+    if (!text) throw new Error('empty');
+    renderResult(name, text);
+
+  } catch(e) {
+    area.innerHTML = '<div style="text-align:center;padding:32px 16px">' +
+      '<div style="font-size:36px;margin-bottom:12px">⚠️</div>' +
+      '<div style="font-size:15px;font-weight:700;margin-bottom:6px">Ошибка запроса</div>' +
+      '<div style="font-size:13px;color:var(--text3)">Проверь API ключ в настройках</div>' +
+      '</div>';
+  }
+
+  btn.disabled = false;
+}
+
+function renderResult(name, text) {
+  // Parse sections
+  var sections = [
+    { key: 'ФАРМАКОЛОГИЧЕСКИЕ', icon: '🔬', cls: 'pharma', label: 'Фармакологические свойства' },
+    { key: 'ПОКАЗАНИЯ',         icon: '✅', cls: 'indica', label: 'Показания к применению' },
+    { key: 'ПРОТИВОПОКАЗАНИЯ',  icon: '🚫', cls: 'contra', label: 'Противопоказания' },
+    { key: 'СПОСОБ',            icon: '💉', cls: 'dosage', label: 'Способ применения и дозы' },
+  ];
+
+  function extractSection(text, startKey, nextKeys) {
+    var startRe = new RegExp(startKey, 'i');
+    var startIdx = text.search(startRe);
+    if (startIdx === -1) return text.trim();
+    var content = text.slice(startIdx);
+    // Find next section start
+    for (var i = 0; i < nextKeys.length; i++) {
+      var nextRe = new RegExp(nextKeys[i], 'i');
+      var nextIdx = content.slice(1).search(nextRe);
+      if (nextIdx !== -1) { content = content.slice(0, nextIdx + 1); break; }
+    }
+    // Remove header line
+    content = content.replace(/^[^\n]*\n/, '').trim();
+    return content || '—';
+  }
+
+  var allKeys = sections.map(function(s){ return s.key; });
+  var parsed = sections.map(function(s, i) {
+    var nextKeys = allKeys.slice(i+1).concat(['В конце', 'основан']);
+    return extractSection(text, s.key, nextKeys);
+  });
+
+  // Format text to HTML
+  function fmt(t) {
+    return t
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      .replace(/\*([^*]+)\*/g, '<b>$1</b>')
+      .replace(/^[-•]\s+/gm, '')
+      .split('\n')
+      .filter(function(l){ return l.trim(); })
+      .map(function(l){ return '<p style="margin-bottom:6px">'+l+'</p>'; })
+      .join('');
+  }
+
+  var html = '<div class="result-wrap">';
+
+  // Header card
+  html += '<div class="med-header-card">' +
+    '<div class="med-name">' + name + '</div>' +
+    '<div class="med-name-sub">Лекарственный препарат</div>' +
+    '<div class="med-source-badge">🤖 AI на основе официальных инструкций</div>' +
+    '</div>';
+
+  // Disclaimer
+  html += '<div class="disclaimer">' +
+    '<div class="disc-icon">⚠️</div>' +
+    '<div class="disc-text">Информация носит <b>справочный характер</b>. Перед применением обязательно проконсультируйтесь с врачом или фармацевтом. Не занимайтесь самолечением.</div>' +
+    '</div>';
+
+  // Section cards
+  sections.forEach(function(s, i) {
+    html += '<div class="section-card">' +
+      '<div class="section-header">' +
+      '<div class="section-icon si-'+s.cls+'">'+s.icon+'</div>' +
+      '<div class="section-title-text st-'+s.cls+'">'+s.label+'</div>' +
+      '</div>' +
+      '<div class="section-body">'+fmt(parsed[i])+'</div>' +
+      '</div>';
+  });
+
+  // Sources
+  var enc = encodeURIComponent(name);
+  html += '<div class="sources-card">' +
+    '<div class="sources-title">🔗 Проверить в официальных источниках</div>' +
+    '<a class="source-link" href="https://grls.rosminzdrav.ru/grls.aspx?t='+enc+'" target="_blank">📋 ГРЛС — Государственный реестр РФ <span class="source-arrow">→</span></a>' +
+    '<a class="source-link" href="https://www.rlsnet.ru/search?q='+enc+'" target="_blank">📖 РЛС — Регистр лекарственных средств <span class="source-arrow">→</span></a>' +
+    '<a class="source-link" href="https://www.vidal.ru/search?q='+enc+'" target="_blank">📚 Видаль — Справочник препаратов <span class="source-arrow">→</span></a>' +
+    '</div>';
+
+  // Add to apteka button
+  html += '<button onclick="addToApt(\''+name+'\')" style="width:100%;padding:13px;border-radius:14px;border:1.5px solid var(--accent);background:var(--accent-ll);color:var(--accent);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">+ Добавить в аптечку</button>';
+
+  html += '</div>';
+  document.getElementById('resultArea').innerHTML = html;
+  document.getElementById('resultArea').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── APTEKA ────────────────────────────────────────────────────────────────
+function renderApt() {
+  var list = document.getElementById('aptList');
+  if (!state.apteka.length) {
+    list.innerHTML = '<div class="apt-empty"><div class="apt-empty-icon">💊</div>Аптечка пуста<br><span style="font-weight:400">Добавьте препараты из поиска<br>или кнопкой выше</span></div>';
+    return;
+  }
+  list.innerHTML = state.apteka.map(function(item, i) {
+    var date = new Date(item.addedAt).toLocaleDateString('ru-RU', {day:'numeric',month:'short'});
+    return '<div class="apt-item" onclick="quickSearch(\''+item.name+'\')">' +
+      '<div class="apt-item-icon">💊</div>' +
+      '<div class="apt-item-body">' +
+        '<div class="apt-item-name">'+item.name+'</div>' +
+        '<div class="apt-item-sub">Добавлено '+date+'</div>' +
+      '</div>' +
+      '<button class="apt-item-del" onclick="event.stopPropagation();delFromApt('+i+')" title="Удалить">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+function addToApt(name) {
+  if (state.apteka.find(function(a){ return a.name.toLowerCase()===name.toLowerCase(); })) {
+    toast('Уже в аптечке!'); return;
+  }
+  state.apteka.push({name:name, addedAt:new Date().toISOString()});
+  save(); toast('Добавлено в аптечку ✓');
+}
+
+function delFromApt(i) {
+  state.apteka.splice(i,1);
+  save(); renderApt(); toast('Удалено из аптечки');
+}
+
+function openAddModal() {
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(function(){ document.getElementById('modalInput').focus(); }, 100);
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('addModal')) {
+    document.getElementById('addModal').classList.remove('open');
+    document.getElementById('modalInput').value = '';
+  }
+}
+function confirmAdd() {
+  var name = document.getElementById('modalInput').value.trim();
+  if (!name) return;
+  addToApt(name);
+  closeModal();
+  renderApt();
+}
+
+// ── COMPAT ────────────────────────────────────────────────────────────────
+async function checkCompat() {
+  var d1 = document.getElementById('compat1').value.trim();
+  var d2 = document.getElementById('compat2').value.trim();
+  if (!d1 || !d2) { toast('Введите оба препарата'); return; }
+  if (!state.apiKey) { goTo('settingsScreen'); toast('Сначала введи API ключ'); return; }
+
+  var area = document.getElementById('compatResult');
+  area.innerHTML = '<div class="loading-wrap"><div class="loading-spinner"></div>' +
+    '<div class="loading-text">Проверяю совместимость...</div></div>';
+
+  try {
+    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
+      body: JSON.stringify({
+        model: 'anthropic/claude-haiku-4-5',
+        max_tokens: 600,
+        messages: [{
+          role: 'system',
+          content: 'Ты медицинский справочник. Отвечай только на основе задокументированных лекарственных взаимодействий из официальных источников. Будь кратким и точным. На русском языке.'
+        },{
+          role: 'user',
+          content: 'Можно ли одновременно принимать "'+d1+'" и "'+d2+'"? Опиши: 1) совместимы или нет, 2) возможные взаимодействия, 3) рекомендации. В начале ответа напиши ВЕРДИКТ: СОВМЕСТИМЫ / ОСТОРОЖНО / НЕСОВМЕСТИМЫ'
+        }]
+      })
+    });
+    var data = await res.json();
+    var text = data.choices && data.choices[0] ? data.choices[0].message.content : '';
+
+    var color = 'var(--green-l)';
+    var borderColor = '#86efac';
+    var icon = '✅';
+    if (/ОСТОРОЖНО/i.test(text)) { color='var(--amber-l)'; borderColor='#fcd34d'; icon='⚠️'; }
+    if (/НЕСОВМЕСТИМЫ/i.test(text)) { color='var(--red-l)'; borderColor='#fca5a5'; icon='🚫'; }
+
+    area.innerHTML = '<div class="result-wrap"><div style="background:'+color+';border:1.5px solid '+borderColor+';border-radius:var(--r);padding:18px 16px;margin-bottom:12px">' +
+      '<div style="font-size:24px;margin-bottom:8px">'+icon+'</div>' +
+      '<div style="font-size:14px;color:var(--text2);line-height:1.65;font-weight:500">'+
+        text.replace(/\n/g,'<br>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')+'</div>' +
+      '</div>' +
+      '<div class="disclaimer"><div class="disc-icon">⚠️</div><div class="disc-text">Обязательно проконсультируйтесь с врачом или фармацевтом перед совместным приёмом препаратов.</div></div>' +
+      '</div>';
+  } catch(e) {
+    area.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3)">Ошибка запроса. Проверь API ключ.</div>';
+  }
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+function saveApiKey() {
+  var k = document.getElementById('apiKeyInput').value.trim();
+  if (!k) { toast('Введи ключ'); return; }
+  state.apiKey = k;
+  save(); updateKeyStatus(); toast('Ключ сохранён ✓');
+  document.getElementById('apiKeyInput').value = '';
+}
+
+function updateKeyStatus() {
+  var el = document.getElementById('keyStatus');
+  if (state.apiKey) {
+    var masked = state.apiKey.slice(0,8) + '••••••••' + state.apiKey.slice(-4);
+    el.innerHTML = '<span class="key-ok">● Ключ установлен: '+masked+'</span>';
+  } else {
+    el.innerHTML = '<span class="key-none">● Ключ не установлен</span>';
+  }
+}
+
+function clearAll() {
+  if (confirm('Удалить все данные аптечки и настройки?')) {
+    localStorage.removeItem('medhelper_v1');
+    location.reload();
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+</script>
+</body>
+</html>
