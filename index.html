@@ -604,7 +604,7 @@ body {
           placeholder="sk-or-v1-...">
         <button class="btn-save-key" onclick="saveApiKey()">Сохранить ключ</button>
         <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">
-          Получить бесплатно на <b>openrouter.ai</b> → 50 запросов/день
+          Получить бесплатно на <b>console.mistral.ai</b> → 1M токенов/месяц
         </div>
       </div>
     </div>
@@ -699,7 +699,7 @@ window.addEventListener('DOMContentLoaded', function() {
   updateKeyStatus();
   if (!state.apiKey) {
     setTimeout(function() {
-      var k = prompt('Введи OpenRouter API ключ (sk-or-...) для поиска лекарств:\n\nПолучить бесплатно: openrouter.ai\nОставь пустым чтобы пропустить:');
+      var k = prompt('Введи Mistral API ключ для поиска лекарств:\n\nПолучить бесплатно: console.mistral.ai\nОставь пустым чтобы пропустить:');
       if (k && k.trim()) { state.apiKey = k.trim(); save(); updateKeyStatus(); toast('API ключ сохранён ✓'); }
     }, 1200);
   }
@@ -752,11 +752,11 @@ async function searchDrug() {
   btn.disabled = true;
 
   try {
-    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    var res = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
       body: JSON.stringify({
-        model: 'anthropic/claude-haiku-4-5',
+        model: 'mistral-small-latest',
         max_tokens: 1200,
         messages: [{
           role: 'system',
@@ -1017,11 +1017,11 @@ async function checkCompat() {
     '<div class="loading-text">Проверяю совместимость...</div></div>';
 
   try {
-    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    var res = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
       body: JSON.stringify({
-        model: 'anthropic/claude-haiku-4-5',
+        model: 'mistral-small-latest',
         max_tokens: 600,
         messages: [{
           role: 'system',
@@ -1095,11 +1095,11 @@ async function getAiPriceHint(btn) {
   var resultEl = document.getElementById('aiPriceResult');
 
   try {
-    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    var res = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: {'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
       body: JSON.stringify({
-        model: 'anthropic/claude-haiku-4-5',
+        model: 'mistral-small-latest',
         max_tokens: 400,
         messages: [{
           role: 'system',
